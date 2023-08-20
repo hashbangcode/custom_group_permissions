@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * Implements hook_form_alter().
+ */
+function custom_group_permissions_form_group_activity_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  // Alters the group_edit_form form for the "Activity" group type.
+  $group = $form_state->getFormObject()->getEntity();
+  if ($group instanceof \Drupal\group\Entity\Group) {
+    $account = \Drupal::currentUser();
+    if ($group->hasPermission('edit group title', $account) === FALSE) {
+      $form['label']['widget']['#disabled'] = TRUE;
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function custom_group_permissions_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  if ($entity->isNew()) {
+    return \Drupal\Core\Access\AccessResult::neutral();
+  }
+  /** @var \Drupal\group\Plugin\Group\Relation\GroupRelationTypeManagerInterface $groupRelationTypeManager */
+  $groupRelationTypeManager = \Drupal::service('group_relation_type.manager');
+
+  // Find all the group relations that define access to this entity.
+  $plugin_ids = $groupRelationTypeManager->getPluginIdsByEntityTypeAccess($entity->getEntityTypeId());
+  if (empty($plugin_ids)) {
+    return \Drupal\Core\Access\AccessResult::neutral();
+  }
+
+  foreach ($plugin_ids as $plugin) {
+    // Attempt to load each plugin service and check for the entity access.
+    $service = "group.relation_handler.access_control.$plugin";
+    if (\Drupal::hasService($service) === TRUE) {
+      $pluginObject = $groupRelationTypeManager->createHandlerInstance($plugin, 'access_control');
+      return $pluginObject->entityAccess($entity, $operation, $account);
+    }
+  }
+}
+

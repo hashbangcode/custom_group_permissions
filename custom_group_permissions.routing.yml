@@ -1,0 +1,9 @@
+custom_group_permissions.example:
+  path: '/group_reports/{group}'
+  defaults:
+    _title: 'Group Report'
+    _controller: '\Drupal\custom_group_permissions\Controller\ReportController::report'
+  requirements:
+    _permission: 'access content'
+    _group_permission: 'access group reports page'
+    _group_member: 'TRUE'

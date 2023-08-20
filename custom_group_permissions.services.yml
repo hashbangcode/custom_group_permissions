@@ -1,0 +1,15 @@
+services:
+  group.relation_handler.permission_provider.custom_group_permissions:
+    class: 'Drupal\custom_group_permissions\Plugin\Group\RelationHandler\CustomGroupPermissionsProvider'
+    arguments: ['@group.relation_handler.permission_provider']
+    shared: false
+
+  group.relation_handler.access_control.custom_group_permissions:
+    class: 'Drupal\custom_group_permissions\Plugin\Group\RelationHandler\CustomGroupAccessControl'
+    arguments: ['@group.relation_handler.access_control']
+    shared: false
+
+  custom_group_permissions.entity:
+    class: 'Drupal\custom_group_permissions\Access\CustomGroupUserPermissions'
+    arguments: ['@entity_type.manager', '@group_relation_type.manager']
+    decorates: access_check.entity

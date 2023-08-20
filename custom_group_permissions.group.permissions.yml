@@ -1,0 +1,12 @@
+edit group title:
+  title: 'Edit group @arg'
+  title_args: {
+    '@arg': 'title'
+  }
+  description: 'Gives members the ability to edit the group title.'
+
+permission_callbacks:
+  - '\Drupal\custom_group_permissions\Access\CustomGroupPermissions::groupPermissions'
+
+access group reports page:
+  title: 'Access Group Reports Page'
